@@ -1,4 +1,4 @@
-# Proyecto A: detección temprana de conversaciones que van a necesitar una persona
+# Proyecto: Detección Temprana de Conversaciones en Riesgo
 
 Con los primeros 4 mensajes de una conversación que empezó la atención automática (agente de IA o
 flujo), y antes de cualquier intervención humana, se predice si la conversación va a necesitar a
