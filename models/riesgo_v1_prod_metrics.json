@@ -1,0 +1,37 @@
+{
+  "version": "riesgo_v1_prod",
+  "trees": 60,
+  "json_bytes": 683696,
+  "temporal_octubre": {
+    "riesgo_v1": {
+      "PR-AUC": 0.7701703033679332,
+      "ROC-AUC": 0.7860568079422883,
+      "Brier": 0.18405280332127621,
+      "riesgo medio": 0.4650431790521265
+    },
+    "riesgo_v1_prod": {
+      "PR-AUC": 0.7714977886021264,
+      "ROC-AUC": 0.7876010381065619,
+      "Brier": 0.18429517385163388,
+      "riesgo medio": 0.4607915329155345,
+      "real": 0.44462474645030425
+    },
+    "diff": {
+      "PR-AUC": 0.0013274852341931265,
+      "ROC-AUC": 0.00154423016427363
+    }
+  },
+  "fuera_de_pliegue_final": {
+    "PR-AUC": 0.84683520229946,
+    "ROC-AUC": 0.8113229884756188,
+    "recall_alerta": 0.8000685871056241,
+    "precision_alerta": 0.732036397866332,
+    "pct_alertado": 0.6046291026370708
+  },
+  "thresholds": {
+    "alert": 0.4613863687716252,
+    "watch": 0.2841281800459567
+  },
+  "prior_train": 0.5532157085941947,
+  "max_abs_diff_json_vs_sklearn": 1.199040866595169e-13
+}
