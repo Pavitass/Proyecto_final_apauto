@@ -22,7 +22,7 @@ src/         features.py (variables) · risk_model.py (modelo, calibración, exp
 app/         app.py (interfaz Streamlit)
 models/      riesgo_v1.joblib · best_params.json · metrics.json
 figures/     gráficas exportadas por los notebooks
-sql/         extract.sql (extracción original, solo lectura) · timing.sql (fuga por transferencia y anticipación en minutos, solo lectura, pendiente de correr)
+sql/         extract.sql (extracción original, solo lectura) · timing.sql (escalaciones en la ventana y anticipación en minutos, solo lectura; resultados en data/timing/)
 model_card.md  ficha del modelo: métricas, umbrales, limitaciones y cómo calcular cada entrada
 ```
 

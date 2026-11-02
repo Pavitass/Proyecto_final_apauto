@@ -17,6 +17,9 @@ semáforo con razones en lenguaje simple.
   Con clientes nuevos da ROC-AUC 0,74, y con empresas nunca vistas, 0,69.
 - **Operación en octubre:** se detectaron **6 de cada 10 casos** al cuarto mensaje y **7 de cada 10
   alertas fueron correctas**, contra 4,4 al azar. En el 10 % más riesgoso, el 96 % necesitó persona.
+- **Anticipación y fuga, medidas en producción:** todas las alertas llegan antes de que escriba una
+  persona, con una mediana de **27 minutos** de margen en los casos en rojo. Las escalaciones dentro
+  de la ventana no afectan al modelo (1 fila de 4.645, ninguna en octubre).
 - **Interfaz:** una aplicación Streamlit para usuarios no técnicos (`app/app.py`).
 - **Reajuste:** un ciclo de monitoreo y reentrenamiento probado sobre los meses reales
   (`src/monitoring.py`, `src/retrain.py`).
@@ -182,6 +185,7 @@ profundidades de 4 a sin límite, hojas de 1 a 40 y `max_features` de 0,1 a 0,7.
 | Filas repetidas entre entrenamiento y prueba | Se cruzan todas las variables. | **0** de 2.465. |
 | Preprocesamiento que ve la prueba | Imputación y escalado dentro del `Pipeline`. `build_features` es fila a fila. | Se ajusta solo con entrenamiento en cada pliegue. |
 | Hiperparámetros o umbral elegidos con la prueba | Búsqueda y umbrales con validación interna (fuera de pliegue anidada). | Octubre solo se usa para reportar. |
+| Mensajes posteriores a una **escalación** dentro de la ventana | `sql/timing.sql` en producción (solo lectura), emparejado con el CSV por variables (99,9 %). Se excluyen las filas afectadas y se reentrena (§3.c). | **1** fila de 4.645 en el dataset principal (agosto, sin persona) y **0** en octubre. Octubre: ROC-AUC 0,786 → 0,783, PR-AUC 0,770 → 0,771, recall a igual volumen 0,623 → 0,620. **No cambia.** Las 1.603 escaladas en ventana son de E09, ya excluida. |
 | Un mismo cliente en validación y en entrenamiento | `StratifiedGroupKFold` y calibración agrupados por cliente. | Sin solapamiento dentro de la validación. |
 
 **Desviación respecto a la propuesta, justificada.** La propuesta decía que un mismo cliente nunca
@@ -201,16 +205,17 @@ agrupa por cliente.
   sobre todo por la mezcla de empresas. Por eso la cifra que se reporta es la de octubre y no la de
   validación.
 
-**Pendiente, solo verificable en producción.** El extractor corta la ventana en el **primer mensaje
-humano**, pero no en el momento de una **transferencia** (`had_handoff`). Si el agente transfirió
-dentro de los primeros 4 mensajes y una persona escribió después, los mensajes posteriores a la
-transferencia estarían en la ventana. La consulta de solo lectura que lo mide ya está escrita
-(`sql/timing.sql`): usa `conversation_sessions.handoff_at` y `escalation_events.escalated_at`, y
-cuenta cuántos de los 4 mensajes de la ventana son posteriores a la transferencia. No devuelve
-identificadores ni texto: las filas se emparejan con el CSV por sus propias variables. Si aparecen
-casos, se excluyen (cortar la ventana en la transferencia los deja con menos de 4 mensajes, así que
-salen de la población) y se recalculan las métricas de octubre. La consulta fue autorizada por el
-equipo, pero los permisos del entorno la bloquearon dos veces; queda lista para correrla.
+**Verificado en producción: no hay fuga por escalación** (Parte 2, §3.c). El extractor corta la
+ventana en el primer mensaje humano, pero no en una escalación. `sql/timing.sql` (solo lectura, sin
+identificadores ni texto) midió cuántos de los 4 mensajes de la ventana son posteriores a la
+escalación (`escalation_events`; `handoff_at` nunca se llena en producción). Pasa en el 2,8 % de las
+conversaciones de E09 (1.603), que ya estaba fuera del dataset principal, y en **una sola** del
+dataset principal, que no está en octubre. Excluirla y reentrenar deja el orden igual (tabla de
+arriba). El recall con el umbral fijo baja de 0,62 a 0,58 porque los escalones de la isotónica se
+corren al cambiar los datos, no porque el modelo empeore: a igual volumen de alertas el recall
+queda en 0,620. Por eso el umbral se vuelve a elegir en cada reentrenamiento. Las cifras de E09 son
+una cota superior: si la escalación no trae la sesión, la consulta la busca por chat en los 7 días
+siguientes y puede tomar la de otra conversación.
 
 ---
 
@@ -242,19 +247,24 @@ Brier de 0,184 a 0,301. La isotónica sin corregir ya acierta, porque el cambio 
 empresas** (covariate shift), que el modelo sigue, y no de proporción dentro de cada empresa.
 **Decisión:** no se corrige la tasa base y se vigila la calibración por empresa.
 
-**Anticipación.** La propuesta prometía medir cuántos minutos antes de la intervención humana llega
-la alerta. Los datos anonimizados no traen la hora del desenlace, así que la cifra en minutos no se
-pudo calcular. Lo que sí está garantizado y medido:
+**Anticipación** (Parte 2, §3.c; `sql/timing.sql` en producción). Minutos entre la predicción
+(cierre del 4.º mensaje) y el desenlace, en las conversaciones de octubre que necesitaron persona:
 
-- **En mensajes, la anticipación es total por construcción:** el modelo predice al cerrar el 4.º
-  mensaje y la ventana solo admite mensajes anteriores al primer mensaje humano. En el 100 % de las
-  conversaciones de octubre la alerta llega **antes** de que escriba una persona. De los 1.096 casos
-  que necesitaron persona, el modelo marca a tiempo en rojo 683 (62 %).
-- **En minutos, la medición está lista:** `sql/timing.sql` calcula, para cada conversación, los
-  segundos entre el 4.º mensaje (momento de la predicción) y la transferencia, la escalación, el
-  primer mensaje humano y el cierre. Con eso se reportan la mediana, los percentiles y la fracción de
-  alertas que llegan antes del desenlace para cada umbral. No se pudo correr por permisos del
-  entorno (ver 3.6). En producción se registra además la hora de la alerta (3.9).
+| Casos | Desenlace | n | Mediana | p25 | p75 | p90 | Antes del desenlace | ≥ 1 min | ≥ 5 min |
+|---|---|---|---|---|---|---|---|---|---|
+| Todas las que necesitaron persona | primer mensaje humano | 1.096 | 28,9 min | 7,0 | 364 | 1.344 | 100 % | 96 % | 83 % |
+| **Marcadas en rojo (alerta)** | primer mensaje humano | 683 | **26,9 min** | 6,0 | 520 | 1.436 | **100 %** | 94 % | **80 %** |
+| Rojo o amarillo (vigilar) | primer mensaje humano | 868 | 32,3 min | 6,5 | 611 | 1.510 | 100 % | 95 % | 82 % |
+| Escaladas por el agente (todas en rojo) | escalación | 29 | 2,5 s | 2,2 s | 3,3 s | 1,9 min | 100 % | 10 % | 10 % |
+
+Lectura: **todas** las alertas llegan antes de que escriba una persona (la ventana lo garantiza) y,
+en los casos en rojo, la mediana del margen es de 27 minutos; en 8 de cada 10 hay 5 minutos o más
+para reaccionar. La cola es larga (p75 de horas) porque muchas conversaciones esperan fuera del
+horario del equipo. Las escalaciones automáticas son pocas fuera de E09 y ocurren segundos después
+del 4.º mensaje: ahí la alerta no adelanta nada, porque el agente ya escala. El valor está en las
+demás, las que una persona toma por iniciativa propia. Las cifras con E09 incluida, que mide la
+sesión que corrió la consulta, son más cortas (primer humano: mediana 4,0 min) porque E09 tiene
+operación mixta con asesores en línea.
 
 ---
 
@@ -368,8 +378,8 @@ Estado al 31 de octubre de 2026. Las celdas citan dónde está la evidencia.
 | **3.3 EDA profundo** | Cumple | Notebook Parte 1, §1–10, 8 figuras; 11 hallazgos con cifras, cada uno ligado a una decisión (§3.3). Incluye intervalos de Wilson para señales escasas y AUC dentro de empresa. | — |
 | **3.4 Paradigma** | Cumple | Supervisado, clasificación binaria; no supervisado descartado con razón. | Opcional: clustering si se agrega texto. |
 | **3.5 Selección del modelo** | Cumple | 2 líneas base y 5 candidatos (kNN, SVM, árbol, RF, GB), cada uno con búsqueda aleatoria agrupada, × 2 variantes, en 4 esquemas; elección argumentada; hiperparámetros en `models/best_params.json`. | — |
-| **3.6 Generalización** | Cumple, con una verificación pendiente | Prueba temporal, clientes nuevos, empresas no vistas, simulación mensual, curvas de aprendizaje y **auditoría de fuga** (10 pruebas, notebook Parte 2 §3.b). | Correr `sql/timing.sql` para descartar transferencias dentro de la ventana (autorizada, bloqueada por permisos). |
-| **3.7 Métricas** | Cumple, con una parcial | PR-AUC, ROC-AUC, recall, precisión, % alertado, calibración y top-k, cada una con su significado; umbral por criterio de negocio; política por empresa evaluada y descartada. | Anticipación en mensajes garantizada (100 % antes del humano); en minutos, consulta lista (`sql/timing.sql`) pero bloqueada por permisos. |
+| **3.6 Generalización** | Cumple | Prueba temporal, clientes nuevos, empresas no vistas, simulación mensual, curvas de aprendizaje y **auditoría de fuga** (11 pruebas, notebook Parte 2 §3.b y §3.c, incluida la verificación en producción de escalaciones dentro de la ventana: 1 fila de 4.645, sin efecto). | — |
+| **3.7 Métricas** | Cumple | PR-AUC, ROC-AUC, recall, precisión, % alertado, calibración y top-k, cada una con su significado; umbral por criterio de negocio; política por empresa evaluada y descartada. | — (anticipación medida en producción: alertas en rojo con mediana de 27 min antes del primer humano, 80 % con ≥ 5 min). |
 | **3.8 Despliegue e interfaz** | Parcial | App Streamlit funcional y probada para no técnicos; artefactos `joblib` y JSON de producción; `model_card.md` con el contrato de entradas. | **Publicarla en una URL** o integrarla en Orvyz, para que la usen clientes reales. Ambas son decisiones del equipo. |
 | **3.9 Reajuste** | Cumple | Detección (PSI y métricas por empresa), criterio y frecuencia (`retrain_decision`), validación retador/vigente a igual volumen y despliegue en paralelo con vuelta atrás; simulado sobre agosto–octubre. | — |
 | **Notebook `model_development.ipynb`** | Cumple | En la raíz del repo: une EDA, preprocesamiento, modelado, fuga, métricas, SHAP y reajuste con justificaciones; ejecutado de principio a fin sin errores. | — |
@@ -390,11 +400,9 @@ Estado al 31 de octubre de 2026. Las celdas citan dónde está la evidencia.
    - un servidor propio;
    - la integración en Orvyz con `riesgo_v1_prod.json`, que es el despliegue real para clientes y ya
      tiene el contrato en `model_card.md`.
-4. **Correr `sql/timing.sql` (solo lectura) mes a mes, de julio a octubre de 2026.** Resuelve dos cosas
-   a la vez: la fuga por transferencia dentro de la ventana (3.6) y la anticipación en minutos (3.7).
-   Se corre con `psql "$URL_DE_LECTURA" -f` tras reemplazar `@FROM@` y `@TO@`. Si hay transferencias
-   antes del 4.º mensaje, se excluyen esas filas, se recalculan las métricas y se reentrena.
-   El equipo la autorizó, pero los permisos del entorno la bloquearon.
+4. **Registrar en Orvyz la hora de cada alerta**, para seguir midiendo la anticipación con la
+   alerta real y no con el 4.º mensaje como aproximación. La verificación de fuga y la anticipación
+   ya se midieron con `sql/timing.sql` (3.6 y 3.7).
 
 ## Anexo: guion del video (2 minutos)
 
