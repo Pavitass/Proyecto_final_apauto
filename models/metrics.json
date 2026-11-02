@@ -1,0 +1,354 @@
+{
+  "modelo": "Random Forest calibrado (isotónica), sin ai_chars_mean",
+  "params": {
+    "max_depth": 12,
+    "max_features": 0.614767370573654,
+    "min_samples_leaf": 10
+  },
+  "umbrales_final": {
+    "alerta": 0.467235298035298,
+    "vigilar": 0.295403798616978
+  },
+  "tasa_base_entrenamiento_final": 0.5532157085941947,
+  "meta_final": {
+    "params": {
+      "max_depth": 12,
+      "max_features": 0.614767370573654,
+      "min_samples_leaf": 10
+    },
+    "n": 5271,
+    "fecha_min": "2025-07-20",
+    "fecha_max": "2026-10-29",
+    "empresas": [
+      "E01",
+      "E02",
+      "E03",
+      "E04",
+      "E05",
+      "E06",
+      "E07",
+      "E08",
+      "E10",
+      "E11",
+      "E12"
+    ],
+    "version": "riesgo_v1",
+    "excluye": [
+      "E09"
+    ]
+  },
+  "fuera_de_pliegue_final": {
+    "PR-AUC": 0.848015929323543,
+    "ROC-AUC": 0.8147066190197432,
+    "recall_alerta": 0.8000685871056241,
+    "precision_alerta": 0.7392268694550064,
+    "pct_alertado": 0.5987478656801366
+  },
+  "octubre": {
+    "Octubre": {
+      "ROC-AUC": 0.786,
+      "PR-AUC": 0.77,
+      "azar PR": 0.445,
+      "recall": 0.623,
+      "precisión": 0.707,
+      "% alertado": 0.392
+    },
+    "Octubre, clientes nuevos": {
+      "ROC-AUC": 0.736,
+      "PR-AUC": 0.784,
+      "azar PR": 0.543,
+      "recall": 0.663,
+      "precisión": 0.7,
+      "% alertado": 0.514
+    }
+  },
+  "octubre_umbrales": {
+    "alerta": 0.5425715069244481,
+    "vigilar": 0.37315070588833354
+  },
+  "octubre_politicas": {
+    "Umbral global": {
+      "recall": 0.6231751824817519,
+      "precisión": 0.7070393374741201,
+      "% alertado": 0.39188640973630834
+    },
+    "Umbral por empresa": {
+      "recall": 0.8056569343065694,
+      "precisión": 0.46943115364168,
+      "% alertado": 0.7630831643002028
+    }
+  },
+  "octubre_tasa_base": {
+    "entrenamiento": 0.6486101211689237,
+    "em": 0.12640728908080492,
+    "real": 0.44462474645030425
+  },
+  "octubre_brier": {
+    "Random Forest sin calibrar": 0.18787896752725672,
+    "Isotónica (tasa de entrenamiento)": 0.18405280332127621,
+    "Isotónica + EM (sin etiquetas)": 0.30142510720250176,
+    "Isotónica + tasa real (referencia)": 0.19867384817617245
+  },
+  "comparacion": [
+    {
+      "variante": "con ai_chars_mean",
+      "modelo": "Mayoritaria",
+      "PR-AUC CV": NaN,
+      "± CV": NaN,
+      "ROC-AUC oct": 0.5,
+      "PR-AUC oct": 0.4446,
+      "ROC-AUC oct nuevos": 0.5,
+      "ROC-AUC empresas no vistas": NaN,
+      "ROC-AUC medio por empresa": NaN,
+      "seg": 0
+    },
+    {
+      "variante": "con ai_chars_mean",
+      "modelo": "Logística",
+      "PR-AUC CV": 0.8313,
+      "± CV": 0.0127,
+      "ROC-AUC oct": 0.7768,
+      "PR-AUC oct": 0.7309,
+      "ROC-AUC oct nuevos": 0.7162,
+      "ROC-AUC empresas no vistas": 0.7017,
+      "ROC-AUC medio por empresa": 0.6374,
+      "seg": 2
+    },
+    {
+      "variante": "con ai_chars_mean",
+      "modelo": "kNN",
+      "PR-AUC CV": 0.8453,
+      "± CV": 0.0141,
+      "ROC-AUC oct": 0.6994,
+      "PR-AUC oct": 0.6338,
+      "ROC-AUC oct nuevos": 0.6181,
+      "ROC-AUC empresas no vistas": 0.544,
+      "ROC-AUC medio por empresa": 0.6054,
+      "seg": 1
+    },
+    {
+      "variante": "con ai_chars_mean",
+      "modelo": "SVM",
+      "PR-AUC CV": 0.8505,
+      "± CV": 0.0067,
+      "ROC-AUC oct": 0.7633,
+      "PR-AUC oct": 0.7343,
+      "ROC-AUC oct nuevos": 0.7247,
+      "ROC-AUC empresas no vistas": 0.6718,
+      "ROC-AUC medio por empresa": 0.6413,
+      "seg": 7
+    },
+    {
+      "variante": "con ai_chars_mean",
+      "modelo": "Árbol",
+      "PR-AUC CV": 0.8474,
+      "± CV": 0.0144,
+      "ROC-AUC oct": 0.7901,
+      "PR-AUC oct": 0.7526,
+      "ROC-AUC oct nuevos": 0.7415,
+      "ROC-AUC empresas no vistas": 0.6866,
+      "ROC-AUC medio por empresa": 0.5849,
+      "seg": 1
+    },
+    {
+      "variante": "con ai_chars_mean",
+      "modelo": "Random Forest",
+      "PR-AUC CV": 0.8857,
+      "± CV": 0.0102,
+      "ROC-AUC oct": 0.8077,
+      "PR-AUC oct": 0.7955,
+      "ROC-AUC oct nuevos": 0.7645,
+      "ROC-AUC empresas no vistas": 0.706,
+      "ROC-AUC medio por empresa": 0.6309,
+      "seg": 16
+    },
+    {
+      "variante": "con ai_chars_mean",
+      "modelo": "Gradient Boosting",
+      "PR-AUC CV": 0.8785,
+      "± CV": 0.0032,
+      "ROC-AUC oct": 0.8125,
+      "PR-AUC oct": 0.7957,
+      "ROC-AUC oct nuevos": 0.7653,
+      "ROC-AUC empresas no vistas": 0.6791,
+      "ROC-AUC medio por empresa": 0.6248,
+      "seg": 16
+    },
+    {
+      "variante": "sin ai_chars_mean",
+      "modelo": "Mayoritaria",
+      "PR-AUC CV": NaN,
+      "± CV": NaN,
+      "ROC-AUC oct": 0.5,
+      "PR-AUC oct": 0.4446,
+      "ROC-AUC oct nuevos": 0.5,
+      "ROC-AUC empresas no vistas": NaN,
+      "ROC-AUC medio por empresa": NaN,
+      "seg": 0
+    },
+    {
+      "variante": "sin ai_chars_mean",
+      "modelo": "Logística",
+      "PR-AUC CV": 0.8301,
+      "± CV": 0.0148,
+      "ROC-AUC oct": 0.7533,
+      "PR-AUC oct": 0.7037,
+      "ROC-AUC oct nuevos": 0.6724,
+      "ROC-AUC empresas no vistas": 0.6534,
+      "ROC-AUC medio por empresa": 0.6382,
+      "seg": 1
+    },
+    {
+      "variante": "sin ai_chars_mean",
+      "modelo": "kNN",
+      "PR-AUC CV": 0.8381,
+      "± CV": 0.0174,
+      "ROC-AUC oct": 0.6839,
+      "PR-AUC oct": 0.6236,
+      "ROC-AUC oct nuevos": 0.6122,
+      "ROC-AUC empresas no vistas": 0.5041,
+      "ROC-AUC medio por empresa": 0.6131,
+      "seg": 1
+    },
+    {
+      "variante": "sin ai_chars_mean",
+      "modelo": "SVM",
+      "PR-AUC CV": 0.8373,
+      "± CV": 0.0115,
+      "ROC-AUC oct": 0.7361,
+      "PR-AUC oct": 0.6876,
+      "ROC-AUC oct nuevos": 0.663,
+      "ROC-AUC empresas no vistas": 0.623,
+      "ROC-AUC medio por empresa": 0.6382,
+      "seg": 7
+    },
+    {
+      "variante": "sin ai_chars_mean",
+      "modelo": "Árbol",
+      "PR-AUC CV": 0.8377,
+      "± CV": 0.0155,
+      "ROC-AUC oct": 0.758,
+      "PR-AUC oct": 0.7115,
+      "ROC-AUC oct nuevos": 0.7084,
+      "ROC-AUC empresas no vistas": 0.5261,
+      "ROC-AUC medio por empresa": 0.6137,
+      "seg": 1
+    },
+    {
+      "variante": "sin ai_chars_mean",
+      "modelo": "Random Forest",
+      "PR-AUC CV": 0.8723,
+      "± CV": 0.0148,
+      "ROC-AUC oct": 0.7861,
+      "PR-AUC oct": 0.7715,
+      "ROC-AUC oct nuevos": 0.7362,
+      "ROC-AUC empresas no vistas": 0.6939,
+      "ROC-AUC medio por empresa": 0.6389,
+      "seg": 15
+    },
+    {
+      "variante": "sin ai_chars_mean",
+      "modelo": "Gradient Boosting",
+      "PR-AUC CV": 0.8664,
+      "± CV": 0.0096,
+      "ROC-AUC oct": 0.79,
+      "PR-AUC oct": 0.7718,
+      "ROC-AUC oct nuevos": 0.7332,
+      "ROC-AUC empresas no vistas": 0.6787,
+      "ROC-AUC medio por empresa": 0.6364,
+      "seg": 14
+    }
+  ],
+  "por_empresa_octubre": [
+    {
+      "empresa": "E01",
+      "n": 1010,
+      "% positivos": 0.2168,
+      "ROC-AUC": 0.6718,
+      "recall": 0.2968,
+      "precisión": 0.5556,
+      "% alertado": 0.1158
+    },
+    {
+      "empresa": "E12",
+      "n": 464,
+      "% positivos": 0.556,
+      "ROC-AUC": 0.5784,
+      "recall": 0.686,
+      "precisión": 0.588,
+      "% alertado": 0.6487
+    },
+    {
+      "empresa": "E06",
+      "n": 427,
+      "% positivos": 0.3443,
+      "ROC-AUC": 0.5929,
+      "recall": 0.4354,
+      "precisión": 0.4706,
+      "% alertado": 0.3185
+    },
+    {
+      "empresa": "E10",
+      "n": 179,
+      "% positivos": 0.8436,
+      "ROC-AUC": 0.7326,
+      "recall": 0.5762,
+      "precisión": 0.9457,
+      "% alertado": 0.514
+    },
+    {
+      "empresa": "E07",
+      "n": 169,
+      "% positivos": 0.9882,
+      "ROC-AUC": 0.7425,
+      "recall": 0.988,
+      "precisión": 0.988,
+      "% alertado": 0.9882
+    },
+    {
+      "empresa": "E04",
+      "n": 109,
+      "% positivos": 0.6055,
+      "ROC-AUC": 0.6228,
+      "recall": 0.6212,
+      "precisión": 0.7069,
+      "% alertado": 0.5321
+    },
+    {
+      "empresa": "E08",
+      "n": 60,
+      "% positivos": 0.95,
+      "ROC-AUC": 0.9123,
+      "recall": 0.9474,
+      "precisión": 0.9818,
+      "% alertado": 0.9167
+    },
+    {
+      "empresa": "E02",
+      "n": 30,
+      "% positivos": 1.0,
+      "ROC-AUC": NaN,
+      "recall": 1.0,
+      "precisión": 1.0,
+      "% alertado": 1.0
+    },
+    {
+      "empresa": "E11",
+      "n": 17,
+      "% positivos": 0.0588,
+      "ROC-AUC": 0.125,
+      "recall": 0.0,
+      "precisión": 0.0,
+      "% alertado": 0.5882
+    }
+  ],
+  "negocio_octubre": {
+    "Conversaciones de octubre": 2465,
+    "Necesitaron persona": 1096,
+    "Detectadas al mensaje 4": 683,
+    "No detectadas": 413,
+    "Alertas por cada 100 conversaciones": 39.2,
+    "Alertas acertadas por cada 10": 7.1,
+    "Acertadas por cada 10 si se alertara al azar": 4.4
+  }
+}
