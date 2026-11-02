@@ -80,13 +80,13 @@
   },
   "octubre_tasa_base": {
     "entrenamiento": 0.6486101211689237,
-    "em": 0.12640728908080492,
+    "em": 0.1264072890808049,
     "real": 0.44462474645030425
   },
   "octubre_brier": {
-    "Random Forest sin calibrar": 0.18787896752725672,
-    "Isotónica (tasa de entrenamiento)": 0.18405280332127621,
-    "Isotónica + EM (sin etiquetas)": 0.30142510720250176,
+    "Random Forest sin calibrar": 0.1878789675272567,
+    "Isotónica (tasa de entrenamiento)": 0.1840528033212762,
+    "Isotónica + EM (sin etiquetas)": 0.3014251072025018,
     "Isotónica + tasa real (referencia)": 0.19867384817617245
   },
   "comparacion": [
@@ -172,7 +172,7 @@
       "ROC-AUC oct nuevos": 0.7653,
       "ROC-AUC empresas no vistas": 0.6791,
       "ROC-AUC medio por empresa": 0.6248,
-      "seg": 16
+      "seg": 17
     },
     {
       "variante": "sin ai_chars_mean",
@@ -256,7 +256,7 @@
       "ROC-AUC oct nuevos": 0.7332,
       "ROC-AUC empresas no vistas": 0.6787,
       "ROC-AUC medio por empresa": 0.6364,
-      "seg": 14
+      "seg": 15
     }
   ],
   "por_empresa_octubre": [

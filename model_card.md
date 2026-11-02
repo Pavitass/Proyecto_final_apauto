@@ -59,7 +59,7 @@ octubre de 2026, sin E09, 2.465 conversaciones con 44,5 % de positivos.
 - **La señal más fuerte es el historial del cliente.** Para clientes nuevos el modelo es más débil.
 - Las señales de texto (pidió asesor, queja, la IA no tenía la información) y los adjuntos aparecen
   en menos del 6 % de las conversaciones: aportan poco.
-- No mide la anticipación en minutos: falta el momento del primer mensaje humano.
+- La anticipación se midió en producción con el 4.º mensaje como momento de la alerta (`sql/timing.sql`): en octubre, las alertas en rojo llegan con una mediana de 27 minutos antes del primer mensaje humano. Para seguirla con la alerta real hay que registrar su hora en Orvyz.
 - Canales: solo se entrenó con WhatsApp e Instagram. Otro canal (Messenger, Telegram) entra como
   WhatsApp (`instagram = 0`) y debe vigilarse aparte.
 - No se probó en E09 ni en tenants con menos de 30 conversaciones.
