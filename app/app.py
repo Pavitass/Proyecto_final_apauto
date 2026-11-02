@@ -147,6 +147,10 @@ def sidebar():
     st.sidebar.write(f"**{model.meta.get('version', '')}**: Random Forest calibrado, sin `ai_chars_mean`.")
     st.sidebar.write(f"Entrenado con {model.meta['n']:,} conversaciones ({model.meta['fecha_min']} a "
                      f"{model.meta['fecha_max']}), {len(model.meta['empresas'])} empresas.".replace(",", "."))
+    st.sidebar.caption(f"Empresas {', '.join(model.meta['empresas'])}. Excluye {', '.join(model.meta.get('excluye', []))} "
+                       "(92 % de los datos, operación mixta). 3.507 clientes; solo conversaciones con 4 mensajes "
+                       "de atención automática sin intervención humana. La prueba de octubre usó un modelo "
+                       "entrenado hasta el 30 de septiembre de 2026 (2.806 conversaciones).")
     st.sidebar.subheader("Prueba en octubre (no vista)")
     st.sidebar.markdown(f"- ROC-AUC **{o['ROC-AUC']:.2f}**, PR-AUC **{o['PR-AUC']:.2f}** (azar {o['azar PR']:.2f})\n"
                         f"- Detecta **{o['recall']:.0%}** de los casos con **{o['precisión']:.0%}** de alertas acertadas")

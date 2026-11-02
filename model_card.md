@@ -17,8 +17,10 @@ la conversación termine necesitando a una persona. Devuelve:
   isotónica** con 5 pliegues agrupados por cliente.
 - Umbrales elegidos con predicciones fuera de pliegue (validación anidada agrupada por cliente):
   **alerta = recall 0,80**, **vigilar = recall 0,95**.
-- Entrenado con **5.271 conversaciones de 11 empresas** (julio de 2025 a octubre de 2026, casi todas
-  de julio a octubre de 2026). **Excluye a E09**, una empresa con operación mixta por diseño (92 % de
+- Entrenado con **5.271 conversaciones de 3.507 clientes y 11 empresas (E01–E08 y E10–E12)**, del 20
+  de julio de 2025 al 29 de octubre de 2026 (88 % entre julio y octubre de 2026). Solo conversaciones
+  que llegaron a 4 mensajes de cliente e IA sin intervención humana: 21.084 mensajes en la ventana.
+  Salen de una extracción de 62.788 conversaciones de 12 empresas. **Excluye a E09**, una empresa con operación mixta por diseño (92 % de
   las filas originales y 95 % de positivos), que dominaría el modelo.
 - **No usa `ai_chars_mean`** (largo de las respuestas automáticas). Funciona como huella de la
   empresa: AUC 0,67 mezclando empresas y 0,51 dentro de cada una. Quitarla cuesta 0,02 de PR-AUC en
@@ -28,8 +30,9 @@ la conversación termine necesitando a una persona. Devuelve:
   completas en `models/metrics.json`.
 
 ## Métricas
-**Prueba temporal (resultado principal):** entrenado con datos hasta septiembre y probado con
-octubre de 2026, sin E09, 2.465 conversaciones con 44,5 % de positivos.
+**Prueba temporal (resultado principal):** entrenado con todo hasta el 30 de septiembre de 2026
+(2.806 conversaciones) y probado con octubre de 2026, sin E09, 2.465 conversaciones con 44,5 % de
+positivos.
 
 | Medida | Octubre | Octubre, solo clientes nuevos |
 |---|---|---|

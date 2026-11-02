@@ -12,8 +12,11 @@ equipo. Con **los primeros 4 mensajes** de la conversación, todos anteriores a 
 humana, un **Random Forest calibrado** estima la probabilidad de que eso ocurra y la traduce en un
 semáforo con razones en lenguaje simple.
 
-- **Prueba temporal:** se entrenó con julio–septiembre de 2026 y se probó con octubre, 2.465
-  conversaciones que el modelo nunca vio. Da **ROC-AUC 0,79 y PR-AUC 0,77**, contra 0,44 al azar.
+- **Alcance:** 11 de las 12 empresas (E01–E08 y E10–E12; E09 se excluye), 5.271 conversaciones de
+  3.507 clientes y 21.084 mensajes, del 20 de julio de 2025 al 29 de octubre de 2026 (88 % entre julio
+  y octubre de 2026). Detalle en §3.1.
+- **Prueba temporal:** se entrenó con todo hasta el 30 de septiembre de 2026 (2.806 conversaciones)
+  y se probó con octubre, 2.465 conversaciones que el modelo nunca vio. Da **ROC-AUC 0,79 y PR-AUC 0,77**, contra 0,44 al azar.
   Con clientes nuevos da ROC-AUC 0,74, y con empresas nunca vistas, 0,69.
 - **Operación en octubre:** se detectaron **6 de cada 10 casos** al cuarto mensaje y **7 de cada 10
   alertas fueron correctas**, contra 4,4 al azar. En el 10 % más riesgoso, el 96 % necesitó persona.
@@ -34,6 +37,7 @@ semáforo con razones en lenguaje simple.
 | **Usuarios** | Asesores y coordinadores de cada negocio, que no son técnicos. También el equipo de Orvyz que mejora los agentes de IA y la propia plataforma, que decide cuándo pasar un chat. |
 | **Decisión que apoya** | 1) Pasar el chat a una persona **antes** de que el cliente se frustre (alerta roja). 2) Ordenar la cola de atención por riesgo. 3) Detectar qué agentes automáticos escalan más de lo esperado para sus conversaciones y necesitan ajustes. |
 | **Datos** | Extracción de **solo lectura** de la base de producción de Orvyz (`sql/extract.sql`, dentro de `BEGIN READ ONLY`), anonimizada antes de salir: 62.788 conversaciones, 12 empresas y 4.347 clientes, casi todas de julio a octubre de 2026. No incluye texto, nombres ni teléfonos. Empresa y cliente son códigos aleatorios. Diccionario en `docs/diccionario_de_datos.md`. |
+| **Alcance del modelo** | **Empresas:** 11 de 12, E01–E08 y E10–E12. E09 (92 % de las conversaciones, 95 % de positivos, operación mixta por diseño) se excluye porque dominaría el modelo (§3.3, hallazgo 1). **Conversaciones:** 5.271 de 3.507 clientes, solo las que empezó la atención automática y llegaron a 4 mensajes (cliente + IA o flujo) sin intervención humana; son 21.084 mensajes en la ventana. **Periodo:** 20 de julio de 2025 a 29 de octubre de 2026, con el 88 % entre julio y octubre de 2026. **Partición:** entrenamiento hasta el 30 de septiembre de 2026 (2.806), prueba octubre de 2026 (2.465). Los resultados valen para estas empresas y este periodo. |
 | **Etiqueta** | `needed_human = 1` si en algún momento escribió una persona del equipo, hubo transferencia o el chat quedó transferido o abandonado. Si no, 0. Se genera sola al cerrar cada conversación, así que no hace falta etiquetar a mano. |
 
 **Por qué tiene sentido el ML.** Las reglas fijas ("si pide asesor, transferir") cubren muy pocos
@@ -76,8 +80,8 @@ Parte 1 de `model_development.ipynb`, figuras `figures/01–07`. Cada hallazgo c
 | # | Hallazgo (con cifra real) | Decisión que tomó |
 |---|---|---|
 | 1 | **E09 es el 92 % de las filas** y necesita persona en el 95 % de los casos. La proporción por empresa va de 7 % a 95 % (fig. 01). | Conjunto principal sin E09. Métricas por empresa. Validación dejando una empresa fuera. |
-| 2 | **El periodo útil es julio–octubre de 2026** (antes casi no había atención automática) (fig. 02). | La separación temporal jul–sep → oct es la evaluación principal. |
-| 3 | **La tasa de positivos cae de 64 % (jul–sep) a 44 % (octubre)** porque cambió qué empresas escribieron: E01, que escala poco, pasó a ser el 40 % de octubre. | Hipótesis de cambio de proporción, que se probó y se **refutó** en 3.7: no se corrige la tasa base. Se vigila la calibración por empresa. |
+| 2 | **El periodo útil es julio–octubre de 2026** (antes casi no había atención automática) (fig. 02). | La separación temporal (todo hasta el 30 de septiembre → octubre) es la evaluación principal. |
+| 3 | **La tasa de positivos cae de 64 % (septiembre) a 44 % (octubre)** porque cambió qué empresas escribieron: E01, que escala poco, pasó a ser el 40 % de octubre. | Hipótesis de cambio de proporción, que se probó y se **refutó** en 3.7: no se corrige la tasa base. Se vigila la calibración por empresa. |
 | 4 | **Canal, hora y día son señales débiles.** Instagram escala algo más (fig. 03). | Entran con codificación cíclica / one-hot, sin expectativas. |
 | 5 | **Las señales más fuertes vistas de a una** son el historial del cliente, el largo de los mensajes y los tiempos (fig. 04–05). | Transformación logarítmica y variables de historial derivadas. |
 | 6 | **`ai_chars_mean` es una huella de la empresa:** ROC-AUC 0,67 mezclando empresas y 0,51 dentro de cada una (fig. 06, 06b). | Se entrena con y sin ella. SHAP lo confirma (67 % de su efecto es la empresa). Se excluye del modelo final. |
@@ -107,7 +111,8 @@ si se amplía la ventana con texto.
 Parte 2 de `model_development.ipynb`, §1–2, figura `10_comparacion_modelos.png`.
 
 **Protocolo**
-1. **Entrenamiento:** julio–septiembre de 2026, 2.806 conversaciones con 65 % de positivos.
+1. **Entrenamiento:** todo hasta el 30 de septiembre de 2026 (desde el 20 de julio de 2025; el 78 %
+   es de julio–septiembre de 2026), 2.806 conversaciones con 65 % de positivos.
    **Prueba:** octubre, 2.465 conversaciones con 44,5 % de positivos. La prueba no se usa para nada
    hasta el final.
 2. **Búsqueda aleatoria de hiperparámetros** (`RandomizedSearchCV`, 20 combinaciones por modelo)
@@ -166,7 +171,7 @@ profundidades de 4 a sin límite, hojas de 1 a 40 y `max_features` de 0,1 a 0,7.
 
 | Esquema | Pregunta | Resultado |
 |---|---|---|
-| **Temporal** (jul–sep → oct) | ¿Funciona el mes siguiente, como en producción? | ROC-AUC **0,786**, PR-AUC **0,770** (azar 0,445) |
+| **Temporal** (hasta sep → oct) | ¿Funciona el mes siguiente, como en producción? | ROC-AUC **0,786**, PR-AUC **0,770** (azar 0,445) |
 | Temporal, solo clientes nuevos | ¿Depende de recordar clientes? | ROC-AUC 0,736, PR-AUC 0,784 (azar 0,543) |
 | Dejar una empresa fuera | ¿Sirve para un negocio nuevo? | ROC-AUC 0,694 |
 | Validación cruzada agrupada por cliente | Solo para elegir hiperparámetros | PR-AUC 0,872 ± 0,015 |
@@ -201,7 +206,7 @@ agrupa por cliente.
   casi no tiene brecha porque está limitada por su forma lineal.
 - El modelo elegido gana en los tres esquemas, no solo en el que guió la búsqueda.
 - **La brecha entre la validación cruzada (0,87) y octubre (0,77) es cambio de distribución, no
-  sobreajuste.** Un clasificador adversario distingue julio–septiembre de octubre con ROC-AUC 0,86,
+  sobreajuste.** Un clasificador adversario distingue el entrenamiento (hasta septiembre) de octubre con ROC-AUC 0,86,
   sobre todo por la mezcla de empresas. Por eso la cifra que se reporta es la de octubre y no la de
   validación.
 

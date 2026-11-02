@@ -3,11 +3,26 @@
 Con los primeros 4 mensajes de una conversación que empezó la atención automática (agente de IA o
 flujo), y antes de cualquier intervención humana, se predice si la conversación va a necesitar a
 una persona del equipo. Los datos son conversaciones reales y anonimizadas de Orvyz (WhatsApp e
-Instagram, julio a octubre de 2026).
+Instagram) de 11 empresas, del 20 de julio de 2025 al 29 de octubre de 2026.
 
 Resultado principal: entrenado con datos hasta septiembre y probado con octubre (sin la empresa
 dominante), **ROC-AUC 0,79 y PR-AUC 0,77, contra 0,44 al azar**. Detalle en
 [`model_card.md`](model_card.md).
+
+## Alcance de los datos
+
+El modelo no cubre todos los clientes de Orvyz: se construyó con empresas y un periodo específicos.
+
+| | |
+|---|---|
+| **Extracción original** | 62.788 conversaciones de 12 empresas y 4.347 clientes, del 20 de julio de 2025 al 29 de octubre de 2026. |
+| **Empresas** | 11 de 12: **E01–E08 y E10–E12**. **E09 queda fuera**: es el 92 % de las conversaciones y necesita persona en el 95 % de los casos porque su operación es mixta por diseño; con ella adentro, el modelo aprendería la operación de E09 y no el problema. |
+| **Conjunto del modelo** | **5.271 conversaciones** de **3.507 clientes**. Solo entran conversaciones que empezó la atención automática y que llegaron a 4 mensajes (del cliente y de la IA o el flujo) sin que interviniera una persona: **21.084 mensajes** en la ventana (5.271 × 4). |
+| **Periodo** | Del 20 de julio de 2025 al 29 de octubre de 2026. El **88 %** está entre julio y octubre de 2026 (septiembre 1.861, octubre 2.465); antes casi no había atención automática. |
+| **Partición** | Entrenamiento: todo hasta el **30 de septiembre de 2026** (2.806 conversaciones). Prueba: **octubre de 2026** (2.465), un mes que el modelo no vio. El modelo final (`riesgo_v1`) se reentrena con las 5.271. |
+
+Los resultados valen para estas empresas y este periodo; con otras empresas o en otro momento hay
+que volver a validarlo (estrategia de reajuste, §3.9 del documento técnico).
 
 ## Estructura
 
