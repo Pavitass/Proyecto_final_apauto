@@ -24,6 +24,7 @@ PR-AUC 0,77**, frente a 0,44 al azar. Detalle completo en [`model_card.md`](mode
 
 - [Qué problema resuelve](#qué-problema-resuelve)
 - [Alcance de los datos](#alcance-de-los-datos)
+- [Variables del dataset](#variables-del-dataset)
 - [Requisitos](#requisitos)
 - [Instalación](#instalación)
 - [Cómo ejecutarlo](#cómo-ejecutarlo)
@@ -60,6 +61,65 @@ El modelo no cubre todos los clientes de Orvyz: se construyó con empresas y un 
 
 Los resultados valen para estas empresas y este periodo; con otras empresas o en otro momento hay
 que volver a validarlo (estrategia de reajuste, §3.9 del documento técnico).
+
+## Variables del dataset
+
+Cada fila de `data/orvyz_conversaciones_riesgo.csv` es una conversación. Salvo el historial y el
+objetivo, todo sale de la **ventana**: los primeros 4 mensajes, todos anteriores a cualquier mensaje
+de una persona del equipo. El CSV trae 25 columnas; `mes` la agrega `load()` al leerlo. Definición
+exacta en [`sql/extract.sql`](sql/extract.sql), contrato de producción en
+[`model_card.md`](model_card.md) y detalle en [`docs/diccionario_de_datos.md`](docs/diccionario_de_datos.md).
+
+**Identificación y momento**
+
+| Variable | Tipo | Significado |
+|---|---|---|
+| `empresa` | texto | Código anónimo de la empresa (E01–E12); no es entrada del modelo, se usa para validar por grupos. |
+| `cliente` | texto | Código anónimo del chat (un cliente en un canal de una empresa); no es entrada del modelo. |
+| `fecha` | fecha | Día de inicio de la conversación, en UTC. |
+| `mes` | texto | Mes de `fecha` (`2026-10`), para la partición temporal; lo calcula `load()`. |
+| `channel` | texto | Canal: `whatsapp` o `instagram`. |
+| `hour_local` | entero | Hora de inicio en Colombia (0–23). |
+| `dow` | entero | Día de la semana en Colombia, ISO: 1 = lunes … 7 = domingo (no hay 0). |
+
+**Cliente (en la ventana)**
+
+| Variable | Tipo | Significado |
+|---|---|---|
+| `w_customer_msgs` | entero | Cuántos de los 4 mensajes son del cliente (1–4). |
+| `cust_chars_mean` / `cust_chars_max` | decimal / entero | Largo promedio y máximo, en caracteres, de los mensajes del cliente (un adjunto sin texto cuenta 0). |
+| `cust_question_marks` | entero | Total de signos `?` que escribió el cliente. |
+| `cust_repeats` | entero | Mensajes del cliente con texto idéntico a uno anterior suyo en la ventana, tras pasar a minúsculas y unir espacios. |
+| `media_image` | entero | Adjuntos del cliente de tipo imagen. |
+| `media_audio` | entero | Audios y notas de voz. |
+| `media_document` | entero | Documentos (PDF y otros archivos). |
+| `media_other` | entero | Cualquier otro adjunto, por ejemplo video o sticker. |
+| `cust_gap_mean_s` | decimal | Segundos promedio entre mensajes consecutivos del cliente. |
+| `cust_asks_human` | 0/1 | El cliente escribió `asesor`, `humano`, `una persona`, `agente real` o `hablar con alguien`. |
+| `cust_negative_words` | 0/1 | El cliente escribió `queja`, `reclamo`, `pesimo`/`pésimo`, `terrible`, `molest…`, `estafa` o `nadie responde`. |
+
+**IA o flujo automático (en la ventana)**
+
+| Variable | Tipo | Significado |
+|---|---|---|
+| `w_ai_msgs` | entero | Cuántos de los 4 son automáticos; siempre `4 − w_customer_msgs`, por eso el modelo no la usa. |
+| `first_ai_reply_s` | decimal | Segundos entre el primer mensaje del cliente y la primera respuesta automática; negativo si la IA escribió primero. |
+| `ai_chars_mean` | decimal | Largo promedio de los mensajes automáticos; el modelo final no la usa porque delata a la empresa. |
+| `ai_no_info` | 0/1 | Un mensaje automático dijo `no tengo`, `no cuento con`, `no dispongo`, `no puedo ayudarte`, `no tengo acceso` o `no encontr…`. |
+
+**Historial y objetivo**
+
+| Variable | Tipo | Significado |
+|---|---|---|
+| `prior_conversations` | entero | Conversaciones anteriores y ya cerradas del **mismo chat** (misma empresa y canal) que cumplen las condiciones de entrada. |
+| `prior_needed_human` | entero | De esas, cuántas necesitaron una persona. |
+| **`needed_human`** | **0/1** | **Objetivo.** 1 si en la conversación completa (no solo la ventana) hubo traspaso, quedó transferida o abandonada, o escribió una persona del equipo; 0 si la automatización la resolvió sola. |
+
+**Por qué hay vacíos.** Solo tres columnas tienen vacíos en las 62.788 filas:
+`first_ai_reply_s` y `ai_chars_mean` están vacías en las **mismas 321 filas**, donde los 4 mensajes
+son del cliente y la IA no alcanzó a responder; `cust_gap_mean_s` está vacía en **705**, cuando el
+cliente escribió un solo mensaje y no hay pausa que medir. Como el vacío significa algo, el
+preprocesamiento crea los indicadores `no_ai_reply` y `single_customer_msg` en vez de imputar a ciegas.
 
 ## Requisitos
 
