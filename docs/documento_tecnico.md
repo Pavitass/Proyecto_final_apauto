@@ -396,7 +396,7 @@ octubre: PR-AUC **0,657 → 0,770** y recall a igual volumen **0,647 → 0,705**
 
 ## Entregables y matriz de cumplimiento
 
-Estado al 31 de octubre de 2026. Las celdas citan dónde está la evidencia.
+Estado al 3 de noviembre de 2026. Las celdas citan dónde está la evidencia.
 
 | Requisito | Estado | Evidencia | Qué falta |
 |---|---|---|---|
@@ -411,13 +411,13 @@ Estado al 31 de octubre de 2026. Las celdas citan dónde está la evidencia.
 | **3.9 Reajuste** | Cumple | Detección (PSI y métricas por empresa), criterio y frecuencia (`retrain_decision`), validación retador/vigente a igual volumen y despliegue en paralelo con vuelta atrás; simulado sobre agosto–octubre. | — |
 | **Notebook `model_development.ipynb`** | Cumple | En la raíz del repo: une EDA, preprocesamiento, modelado, fuga, métricas, SHAP y reajuste con justificaciones; ejecutado de principio a fin sin errores. | — |
 | **Repositorio** | Cumple | Repositorio git en GitHub: <https://github.com/Pavitass/Proyecto_final_apauto>. README con correspondencia al enunciado, `.gitignore` y código en `src/`. | — |
-| **Video de 2 minutos** | En proceso | Guion en el anexo; grabación en curso. | Publicar el enlace en el README y en este documento una vez grabado. |
-| **Presentación** | No aplica todavía | Este documento sigue el orden que pide la evaluación. | Preparar las diapositivas, si se piden. |
+| **Video de 2 minutos** | Cumple | Publicado en YouTube: <https://www.youtube.com/watch?v=odb7sy0w0uc>. Guion en el anexo. Enlace también en el README. | — |
+| **Presentación** | Pendiente | Este documento sigue el orden que pide la evaluación. | Preparar las diapositivas y ensayar el reparto de tiempo (20 min: diapositivas + notebook). |
 
 ## Pendientes y decisiones del equipo
 
-1. **Grabar el video** (guion abajo). En curso. Al terminar, publicar el enlace en el README y en
-   la matriz de arriba.
+1. **Video publicado.** En YouTube: <https://www.youtube.com/watch?v=odb7sy0w0uc> (guion en el
+   anexo). El enlace está también en el README.
 2. **Interfaz publicada.** La app está en línea en Streamlit Community Cloud:
    <https://proyectofinalapauto-gos8hw7a3ademgukdhnjsh.streamlit.app/>. Como despliegue real para
    clientes de Orvyz queda la integración en la plataforma con `riesgo_v1_prod.json`, que ya tiene
