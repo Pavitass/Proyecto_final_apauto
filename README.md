@@ -15,7 +15,7 @@ octubre (un mes que el modelo nunca vio, sin la empresa dominante), alcanza **RO
 PR-AUC 0,77**, frente a 0,44 al azar. Detalle completo en [`model_card.md`](model_card.md).
 
 - **Repositorio:** <https://github.com/Pavitass/Proyecto_final_apauto>
-- **Video de demostración (2 min):** _pendiente de publicar_ · se agregará el enlace aquí
+- **Video de demostración (2 min):** https://www.youtube.com/watch?v=odb7sy0w0uc
 - **Interfaz en vivo:** <https://proyectofinalapauto-gos8hw7a3ademgukdhnjsh.streamlit.app/> (Streamlit Community Cloud)
 
 ---
