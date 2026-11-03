@@ -63,7 +63,7 @@ def get_model():
 
 @st.cache_data
 def get_metrics():
-    return json.load(open(ROOT / "models" / "metrics.json"))
+    return json.load(open(ROOT / "models" / "metrics.json", encoding="utf-8"))
 
 
 @st.cache_data
