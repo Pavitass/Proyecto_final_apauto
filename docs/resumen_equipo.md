@@ -24,13 +24,13 @@ Por eso los resultados valen para estas empresas y este periodo. Si se usara con
 - **Anticipación:** todas las alertas llegan antes de que escriba una persona. En los casos rojos, la mediana es de **27 minutos** de margen, y el 80 % tiene 5 minutos o más.
 
 **5. Despliegue y reajuste.**
-- **Despliegue:** app Streamlit para no técnicos, con semáforo y razones en lenguaje simple; hoy corre en local.
+- **Despliegue:** app Streamlit para no técnicos, publicada en <https://proyectofinalapauto-gos8hw7a3ademgukdhnjsh.streamlit.app/>. Se escribe la conversación como un chat de 4 mensajes y la app calcula sola las variables, con las mismas reglas del extractor. Muestra un medidor de riesgo, el semáforo y las razones en lenguaje simple. Además tiene una bandeja ordenada por riesgo (acepta un CSV), ejemplos reales y una pestaña que explica el modelo.
 - **Reajuste:** monitoreo mensual de cambios en los datos y del recall por empresa. Reentrena si el recall cae, llegan empresas nuevas o pasan 3 meses. El modelo nuevo reemplaza al actual solo si lo supera en la misma prueba.
 
 **6. Dónde está cada cosa.**
 - `model_development.ipynb`: el notebook entregable, completo.
 - `docs/documento_tecnico.md`: el documento técnico (3.1–3.9, la matriz de cumplimiento y el guion del video).
-- `app/app.py`: la interfaz.
+- `app/app.py`: la interfaz (capturas en `figures/app_*.png`).
 - `README.md`: cómo instalar y correr todo.
 - Para correr la app:
   ```
@@ -40,7 +40,7 @@ Por eso los resultados valen para estas empresas y este periodo. Si se usara con
 
 **7. Lo que falta** (responsable por definir):
 - [ ] Todos: aceptar la invitación al repo.
-- [ ] Publicar la app en Streamlit Cloud (share.streamlit.io → conectar el repo → `app/app.py`) y poner el enlace en el README.
+- [x] Publicar la app en Streamlit Cloud (hecho: enlace en el README).
 - [ ] Grabar el video de 2 minutos. El guion está en el anexo del documento técnico.
 - [ ] Preparar la presentación.
 

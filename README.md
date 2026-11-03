@@ -137,6 +137,18 @@ Los notebooks de [`notebooks/`](notebooks/) (01 → 02 → 03) recorren los mism
 ```
 </details>
 
+#### Cómo usar la interfaz
+
+| Pestaña | Para qué |
+|---|---|
+| **Conversación** | Se escriben los primeros 4 mensajes como un chat: quién envía cada uno (cliente o atención automática), la hora, el texto y un adjunto opcional. Arriba van el canal, el día y el historial del cliente. La app calcula sola las variables con la misma definición de `sql/extract.sql` y muestra un medidor con el % de riesgo, el semáforo con la acción sugerida y las razones. Tres botones cargan conversaciones inventadas de ejemplo (verde, roja y dudosa). El formulario numérico queda en "Modo avanzado". |
+| **Bandeja** | La cola ordenada de mayor a menor riesgo, con semáforo, % y razón principal. Al seleccionar una fila se ve el detalle. Con "Subir un CSV" (las columnas del dataset) devuelve el ranking descargable. |
+| **Ejemplos reales (anonimizados)** | 24 conversaciones de octubre, 8 por nivel, con lo que pasó en realidad. Son ilustrativas: el modelo final ya vio octubre. |
+| **Cómo funciona el modelo** | Las métricas de octubre en lenguaje simple, el alcance de los datos, la importancia SHAP, el rendimiento por mes, la anticipación y la regla de reajuste. |
+
+Capturas en `figures/app_*.png`. Para comprobar que el cálculo desde el chat coincide con el
+extractor: `python tests/test_chat_features.py`.
+
 ### 3. Reentrenar y comparar contra el modelo vigente
 
 <details open>
@@ -172,12 +184,15 @@ data/                     orvyz_conversaciones_riesgo.csv (anonimizado) y data/t
 notebooks/                Los mismos pasos en tres partes: 01 EDA y preprocesamiento ·
                           02 modelado, calibración y SHAP · 03 monitoreo y reentrenamiento.
 src/                      features.py (variables) · risk_model.py (modelo, calibración, explicación)
+                          chat_features.py (variables desde los mensajes, misma definición que
+                          sql/extract.sql) ·
                           monitoring.py (PSI, métricas por empresa, regla de reentrenamiento) ·
                           retrain.py (retador vs. vigente) · baseline.py (prueba inicial) ·
                           export_production.py (export JSON) · timing.py (anticipación).
 app/                      app.py (interfaz Streamlit para usuarios no técnicos).
+tests/                    test_chat_features.py (chat → variables coincide con el extractor).
 models/                   riesgo_v1.joblib · best_params.json · metrics.json · export de producción.
-figures/                  Gráficas exportadas por los notebooks.
+figures/                  Gráficas exportadas por los notebooks · app_*.png (capturas de la interfaz).
 docs/                     documento_tecnico.md (documento del proyecto, 3.1–3.9 y matriz de
                           cumplimiento) · propuesta · diccionario de datos · resumen del equipo.
 sql/                      extract.sql (extracción original, solo lectura) · timing.sql
@@ -215,5 +230,5 @@ El documento completo, con la matriz de cumplimiento y los pendientes, está en
 | 3.6 Generalización | Parte 2 §1–3 y §3.b (auditoría de fuga) |
 | 3.7 Métricas | Parte 2 §4–5 (PR-AUC, recall/precisión, calibración, métricas de negocio) |
 | Explicabilidad | Parte 2 §6 (SHAP global, huella de empresa, por predicción) |
-| 3.8 Despliegue e interfaz | `app/app.py`, `models/`, `model_card.md` |
+| 3.8 Despliegue e interfaz | `app/app.py`, `src/chat_features.py`, `tests/`, `models/`, `model_card.md` |
 | 3.9 Reentrenamiento | Parte 3; `src/monitoring.py`, `src/retrain.py` |

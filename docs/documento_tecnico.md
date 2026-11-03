@@ -23,7 +23,8 @@ semáforo con razones en lenguaje simple.
 - **Anticipación y fuga, medidas en producción:** todas las alertas llegan antes de que escriba una
   persona, con una mediana de **27 minutos** de margen en los casos en rojo. Las escalaciones dentro
   de la ventana no afectan al modelo (1 fila de 4.645, ninguna en octubre).
-- **Interfaz:** una aplicación Streamlit para usuarios no técnicos (`app/app.py`).
+- **Interfaz:** una aplicación Streamlit para usuarios no técnicos (`app/app.py`): se escribe la
+  conversación como un chat y la app calcula sola las variables, con una bandeja ordenada por riesgo.
 - **Reajuste:** un ciclo de monitoreo y reentrenamiento probado sobre los meses reales
   (`src/monitoring.py`, `src/retrain.py`).
 
@@ -275,22 +276,42 @@ operación mixta con asesores en línea.
 
 ## 3.8 Despliegue e interfaz
 
-**Interfaz para usuarios no técnicos: `app/app.py` (Streamlit)**
-- **Pestaña "Ejemplos reales (anonimizados)":** 24 conversaciones de octubre, 8 por nivel. Se
-  elige una y se ve:
-  - el **% de riesgo** con una barra que marca los umbrales;
-  - el **semáforo** con la acción sugerida (*Alerta: pasar a una persona ahora*, *Vigilar: subir en
-    la cola*, *Bajo: la atención automática probablemente la resuelve*);
-  - **"Por qué"**: hasta 5 razones en frases ("De sus 8 conversaciones anteriores, 8 necesitaron a
-    una persona", "Sus mensajes son muy cortos"), con flecha ▲/▼ y cuántos puntos mueve cada una;
-  - un desplegable **"¿Qué pasó en realidad?"** para contrastar con el desenlace.
-- **Pestaña "Ingresar una conversación":** un formulario con controles simples (canal, día, hora,
-  cuántos mensajes, largo, fotos y audios, si la IA respondió, si el cliente pidió asesor) que
-  recalcula el riesgo al instante.
+**Interfaz para usuarios no técnicos: `app/app.py` (Streamlit)**. Capturas en `figures/app_*.png`.
+- **Pestaña "Conversación":** un editor tipo chat con 4 burbujas. En cada una se indica quién la
+  envía (cliente o atención automática), la hora, el texto y un adjunto opcional (foto, audio,
+  documento u otro). Arriba van el canal, el día y el historial del cliente en lenguaje simple
+  ("¿Cuántas veces ha escrito antes?", "¿Cuántas de esas necesitaron persona?").
+  - La app calcula sola todas las variables desde las burbujas (largos, «?», repetidos, segundos
+    entre mensajes, primera respuesta, "no tengo la información", pidió asesor, palabras de queja)
+    con `src/chat_features.py`, que replica la definición de `sql/extract.sql`: misma ventana,
+    misma normalización del texto, mismas expresiones regulares y el mismo redondeo de Postgres.
+    `tests/test_chat_features.py` lo verifica en 4 casos cuyos valores esperados se obtuvieron
+    corriendo la consulta del extractor sobre esos mensajes en un Postgres 15 local.
+  - Tres botones cargan conversaciones inventadas de ejemplo: una verde (cliente frecuente, 5 %),
+    una roja (pedido que no llega, 80 %) y una dudosa (cambio de talla, 39 %, amarillo).
+  - El resultado muestra un **medidor** con el % de riesgo y las zonas del semáforo, la acción
+    sugerida (*Alerta: pasar a una persona ahora*, *Vigilar: subir en la cola*, *Bajo: la atención
+    automática probablemente la resuelve*) y hasta 5 razones en frases, con flecha ▲/▼ y cuántos
+    puntos mueve cada una. Un desplegable muestra lo que la app calculó.
+  - El formulario numérico anterior queda en un desplegable "Modo avanzado".
+- **Pestaña "Bandeja":** la cola ordenada de mayor a menor riesgo, con semáforo, % y razón
+  principal. Al seleccionar una fila se ve el detalle. Funciona con los ejemplos de octubre o con un
+  CSV subido con las columnas del dataset, y devuelve el ranking descargable.
+- **Pestaña "Ejemplos reales (anonimizados)":** 24 conversaciones de octubre, 8 por nivel, con un
+  desplegable **"¿Qué pasó en realidad?"**. Un aviso visible explica que son ilustrativas: el modelo
+  final se reentrenó con todos los meses, incluido octubre, y la evaluación sin ver los datos está
+  en el notebook.
+- **Pestaña "Cómo funciona el modelo":** las métricas de octubre en tarjetas y en lenguaje simple
+  ("7 de cada 10 alertas son correctas"), el alcance de los datos, la importancia SHAP global, el
+  rendimiento por mes, la anticipación y la regla de reajuste. Toma las cifras de
+  `models/metrics.json` y las figuras de `figures/`; no recalcula nada.
 - **Barra lateral:** qué modelo es, con qué datos se entrenó, su desempeño en octubre en lenguaje
   llano y una advertencia de que las razones son correlaciones, no causas.
 - No hace falta escribir código, conocer las variables ni interpretar probabilidades crudas.
-- Se verificó con `streamlit.testing.AppTest` (sin excepciones en ambas pestañas) y en el navegador.
+- Se verificó con `streamlit.testing.AppTest` (sin excepciones; los tres ejemplos dan rojo,
+  amarillo y verde) y en Chrome, recorriendo las cuatro pestañas en modo claro y oscuro, con los
+  ejemplos del chat, la selección de una fila de la bandeja y la carga de un CSV de 200
+  conversaciones, sin errores en la consola.
 
 **Cómo se ejecuta**
 ```bash
@@ -312,8 +333,9 @@ operación mixta con asesores en línea.
 - Comparación, por agente de IA, de la tasa real de escalamiento contra la esperada por el modelo.
 - Las reglas explícitas, como "pidió asesor → transferir", van antes que el modelo.
 
-**Estado:** la interfaz funciona **en local**. Publicarla en una URL (Streamlit Community Cloud o un
-servidor) y la integración en la plataforma requieren decisiones del equipo (ver "Pendientes").
+**Estado:** la interfaz está publicada en Streamlit Community Cloud
+(<https://proyectofinalapauto-gos8hw7a3ademgukdhnjsh.streamlit.app/>). La integración en la
+plataforma queda como siguiente paso (ver "Pendientes").
 
 ---
 
