@@ -385,7 +385,7 @@ Estado al 31 de octubre de 2026. Las celdas citan dónde está la evidencia.
 | **3.5 Selección del modelo** | Cumple | 2 líneas base y 5 candidatos (kNN, SVM, árbol, RF, GB), cada uno con búsqueda aleatoria agrupada, × 2 variantes, en 4 esquemas; elección argumentada; hiperparámetros en `models/best_params.json`. | — |
 | **3.6 Generalización** | Cumple | Prueba temporal, clientes nuevos, empresas no vistas, simulación mensual, curvas de aprendizaje y **auditoría de fuga** (11 pruebas, notebook Parte 2 §3.b y §3.c, incluida la verificación en producción de escalaciones dentro de la ventana: 1 fila de 4.645, sin efecto). | — |
 | **3.7 Métricas** | Cumple | PR-AUC, ROC-AUC, recall, precisión, % alertado, calibración y top-k, cada una con su significado; umbral por criterio de negocio; política por empresa evaluada y descartada. | — (anticipación medida en producción: alertas en rojo con mediana de 27 min antes del primer humano, 80 % con ≥ 5 min). |
-| **3.8 Despliegue e interfaz** | Cumple (publicación planificada) | App Streamlit funcional y probada para no técnicos; artefactos `joblib` y JSON de producción; `model_card.md` con el contrato de entradas. | **Publicarla en una URL** (Streamlit Community Cloud, desde el repo de GitHub) es el último paso, una vez cerrado el resto. La integración en Orvyz con `riesgo_v1_prod.json` queda como despliegue real. |
+| **3.8 Despliegue e interfaz** | Cumple | App Streamlit publicada y accesible en <https://proyectofinalapauto-gos8hw7a3ademgukdhnjsh.streamlit.app/> (Streamlit Community Cloud); probada para no técnicos; artefactos `joblib` y JSON de producción; `model_card.md` con el contrato de entradas. | La integración en Orvyz con `riesgo_v1_prod.json` queda como despliegue real en la plataforma. |
 | **3.9 Reajuste** | Cumple | Detección (PSI y métricas por empresa), criterio y frecuencia (`retrain_decision`), validación retador/vigente a igual volumen y despliegue en paralelo con vuelta atrás; simulado sobre agosto–octubre. | — |
 | **Notebook `model_development.ipynb`** | Cumple | En la raíz del repo: une EDA, preprocesamiento, modelado, fuga, métricas, SHAP y reajuste con justificaciones; ejecutado de principio a fin sin errores. | — |
 | **Repositorio** | Cumple | Repositorio git en GitHub: <https://github.com/Pavitass/Proyecto_final_apauto>. README con correspondencia al enunciado, `.gitignore` y código en `src/`. | — |
@@ -396,12 +396,10 @@ Estado al 31 de octubre de 2026. Las celdas citan dónde está la evidencia.
 
 1. **Grabar el video** (guion abajo). En curso. Al terminar, publicar el enlace en el README y en
    la matriz de arriba.
-2. **Publicar la interfaz** para que la usen personas reales. Es el **último paso**, una vez cerrado
-   el resto. Opciones:
-   - Streamlit Community Cloud, que se conecta con el repositorio de GitHub ya existente;
-   - un servidor propio;
-   - la integración en Orvyz con `riesgo_v1_prod.json`, que es el despliegue real para clientes y ya
-     tiene el contrato en `model_card.md`.
+2. **Interfaz publicada.** La app está en línea en Streamlit Community Cloud:
+   <https://proyectofinalapauto-gos8hw7a3ademgukdhnjsh.streamlit.app/>. Como despliegue real para
+   clientes de Orvyz queda la integración en la plataforma con `riesgo_v1_prod.json`, que ya tiene
+   el contrato en `model_card.md`.
 3. **Registrar en Orvyz la hora de cada alerta**, para seguir midiendo la anticipación con la
    alerta real y no con el 4.º mensaje como aproximación. La verificación de fuga y la anticipación
    ya se midieron con `sql/timing.sql` (3.6 y 3.7).

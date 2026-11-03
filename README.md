@@ -16,7 +16,7 @@ PR-AUC 0,77**, frente a 0,44 al azar. Detalle completo en [`model_card.md`](mode
 
 - **Repositorio:** <https://github.com/Pavitass/Proyecto_final_apauto>
 - **Video de demostración (2 min):** _pendiente de publicar_ · se agregará el enlace aquí
-- **Interfaz en vivo:** _pendiente de publicar_ (Streamlit Community Cloud)
+- **Interfaz en vivo:** <https://proyectofinalapauto-gos8hw7a3ademgukdhnjsh.streamlit.app/> (Streamlit Community Cloud)
 
 ---
 
