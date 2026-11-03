@@ -150,7 +150,7 @@ def describe(group, r):
         return f"Sus mensajes son {size} ({r.cust_chars_mean:.0f} caracteres en promedio)"
     if group == "preguntas":
         q = int(r.cust_question_marks)
-        return f"Hizo {_plural(q, 'pregunta', 'preguntas')} explícitas (con «?»)" if q else "No hizo preguntas explícitas"
+        return f"Hizo {_plural(q, 'pregunta explícita', 'preguntas explícitas')} (con «?»)" if q else "No hizo preguntas explícitas"
     if group == "mensajes":
         return f"Escribió {_plural(int(r.w_customer_msgs), 'mensaje', 'mensajes')} en los primeros 4"
     if group == "respuesta":
