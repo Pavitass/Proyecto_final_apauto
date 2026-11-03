@@ -200,7 +200,7 @@ def main():
     ap.add_argument("--trees", type=int, default=N_TREES)
     a = ap.parse_args()
 
-    params = json.load(open(ROOT / "models" / "best_params.json"))
+    params = json.load(open(ROOT / "models" / "best_params.json", encoding="utf-8"))
     raw = load(ROOT / "data" / "orvyz_conversaciones_riesgo.csv")
     raw = raw[raw.empresa != DOMINANT].reset_index(drop=True)
     X, y, g = build_features(raw, DROP), raw[TARGET].values, raw.cliente.values
